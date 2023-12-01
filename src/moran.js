@@ -49,12 +49,12 @@ export async function calculateMoran(featureCollection, valueField, opts = {}) {
         const neighbors = [...neighborIds].map(d => localResultMap.get(d));
         const neighborZs = neighbors.map(d => d.z);
         const weights = [...areaWeightEntry.values()];
-        if (localResult.z != null) {
+        if (localResult.z != null && Number.isFinite(localResult.z)) {
             const localMoranResult = unadjustedLocalMoran(localResult.z, neighborZs, weights);
             localResult.lag = localMoranResult.lag;
             localResult.moranLocal = localMoranResult.moranLocal;
             localResult.neighborZs = neighborZs;
-            if (localResult.moranLocal != undefined) {
+            if (localResult.moranLocal != null && Number.isFinite(localResult.moranLocal)) {
                 m2 += localResult.z ** 2;
                 moranGlobal += localResult.moranLocal;
             }
@@ -77,10 +77,15 @@ export async function calculateMoran(featureCollection, valueField, opts = {}) {
     return result;
 }
 export async function calculatePValues(moranResult, opts = {}) {
-    Object.assign(opts, {
+    // Object.assign({
+    //   progressCallback: (p:number) => p,
+    //   permutations: 999,
+    // }, opts)
+    opts = {
         progressCallback: (p) => p,
         permutations: 999,
-    });
+        ...opts
+    };
     const permutations = opts.permutations;
     const progressCallback = opts.progressCallback;
     // This is approximating proper permutation
@@ -113,7 +118,7 @@ export async function calculatePValues(moranResult, opts = {}) {
                     }
                     const neighborZs = sample.map(d => d.z);
                     const moranLocal = unadjustedLocalMoran(localResult.z, neighborZs, weights);
-                    if (moranLocal.moranLocal != undefined && localResult.moranLocal != undefined) {
+                    if (moranLocal.moranLocal != undefined && localResult.moranLocal != undefined && Number.isFinite(localResult.moranLocal)) {
                         bsLocalMorans.push(moranLocal.moranLocal);
                         if (Math.abs(moranLocal.moranLocal) >= Math.abs(localResult.moranLocal)) {
                             moreExtremeCount++;
@@ -193,7 +198,7 @@ export async function calculatePValues(moranResult, opts = {}) {
                 const weightValues = [...weights.values()];
                 const neighborZs = neighborIds.map(id => zMap.get(id));
                 const moranLocalResult = unadjustedLocalMoran(z, neighborZs, weightValues);
-                if (moranLocalResult.moranLocal != undefined) {
+                if (moranLocalResult.moranLocal != undefined && Number.isFinite(moranLocalResult.moranLocal)) {
                     globalMoran += moranLocalResult.moranLocal;
                 }
             }
