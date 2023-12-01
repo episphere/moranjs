@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@types/d3": "^7.4.0",
+    "@types/d3-array": "^3.0.3",
+    "@types/geojson": "^7946.0.10",
+    "@types/kd-tree-javascript": "^1.0.1",
+    "@types/topojson-client": "^3.1.1",
+    "@types/topojson-server": "^3.0.1"
+  }
+}
